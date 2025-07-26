@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="나만의 타이머">
+    <title>나만의 타이머</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="timer-container">
+        <div id="time-picker" class="time-picker">
+            <select id="hours"></select>
+            <span>시간</span>
+            <select id="minutes"></select>
+            <span>분</span>
+            <select id="seconds"></select>
+            <span>초</span>
+        </div>
+
+        <div id="time-display">00:00:00</div>
+        
+        <div class="buttons">
+            <button id="start-btn">시작</button>
+            <button id="pause-btn">일시정지</button>
+            <button id="reset-btn">초기화</button>
+        </div>
+        <div class="buttons">
+            <button id="video-btn">동영상</button>
+        </div>
+    </div>
+
+    <div id="video-container">
+        <video id="my-video" src="https://chriskwon-86.github.io/timer-app/video.mp4" playsinline></video>
+        <button id="exit-video-btn">종료</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

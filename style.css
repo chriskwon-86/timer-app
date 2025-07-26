@@ -1,0 +1,98 @@
+/* 전체 화면 스타일 */
+body {
+    background-color: #1c1c1e; /* 아이폰 다크모드와 비슷한 배경색 */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    text-align: center;
+    overflow: hidden; /* 스크롤 방지 */
+}
+
+.timer-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 80%;
+}
+
+/* 시간 선택 피커 */
+.time-picker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+.time-picker select {
+    background: #333;
+    color: white;
+    border: none;
+    font-size: 24px;
+    padding: 10px;
+    -webkit-appearance: none; /* 아이폰 기본 스타일 제거 */
+    -moz-appearance: none;
+    appearance: none;
+    text-align: center;
+}
+.time-picker span {
+    font-size: 24px;
+    margin: 0 10px;
+}
+
+/* 시간 글자 스타일 */
+#time-display {
+    font-size: 72px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: none; /* 처음엔 숨겨둠 */
+}
+
+/* 버튼 스타일 */
+.buttons {
+    margin-top: 15px;
+}
+button {
+    font-size: 18px;
+    padding: 12px 24px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 50px; /* 동그란 버튼 */
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    min-width: 80px;
+}
+#start-btn {
+    background-color: #34c759; /* 초록색 */
+    color: black;
+}
+#pause-btn {
+    background-color: #ff9500; /* 주황색 */
+}
+
+/* 동영상 재생 화면 */
+#video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index: 100;
+    display: none; /* 처음엔 숨김 */
+}
+#my-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 비디오 비율 유지 */
+}
+#exit-video-btn {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    z-index: 110;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid white;
+}
