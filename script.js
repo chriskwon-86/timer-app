@@ -189,31 +189,48 @@ function placeStone(x, y, player) {
     drawStone(x, y, player);
 }
 
-// AI가 최적의 수를 찾는 로직
+// AI가 최적의 수를 찾는 로직 (업그레이드 버전)
 function findBestMove() {
     let bestScore = -Infinity;
     let move = { x: -1, y: -1 };
 
-    // 중앙 우선
+    // 첫 수일 경우 중앙에 두도록 강제
     const center = Math.floor(BOARD_SIZE / 2);
-    const moves = [{ x: center, y: center }];
+    if (board.flat().every(cell => cell === 0)) {
+        return { x: center, y: center };
+    }
+
+    // 모든 빈 칸 대신, 돌이 놓인 주변만 탐색하여 효율성 증대
+    const candidateMoves = new Set();
     for (let y = 0; y < BOARD_SIZE; y++) {
         for (let x = 0; x < BOARD_SIZE; x++) {
-            if (board[y][x] === 0) {
-                moves.push({ x, y });
+            if (board[y][x] !== 0) continue; // 빈 칸이 아니면 건너뛰기
+
+            // 주변에 다른 돌이 있는지 확인 (탐색 범위 1칸)
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    if (i === 0 && j === 0) continue;
+                    const nx = x + i;
+                    const ny = y + j;
+
+                    if (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE && board[ny][nx] !== 0) {
+                        candidateMoves.add(`${x},${y}`);
+                    }
+                }
             }
         }
     }
 
-    for (let i = 0; i < moves.length; i++) {
-        const { x, y } = moves[i];
+    // 후보군에 대해 점수 계산
+    for (const moveStr of candidateMoves) {
+        const [x, y] = moveStr.split(',').map(Number);
 
-        // AI의 공격 점수
-        board[y][x] = 2;
+        // AI의 공격 점수 계산
+        board[y][x] = 2; // AI(백돌)를 놓는다고 가정
         let score = evaluateBoard(2);
 
-        // 플레이어의 공격 점수(AI의 수비 점수)
-        board[y][x] = 1;
+        // 플레이어의 공격 점수(AI의 수비 점수) 계산
+        board[y][x] = 1; // 플레이어(흑돌)를 막는다고 가정
         score += evaluateBoard(1);
 
         board[y][x] = 0; // 보드 원상복구
@@ -226,20 +243,23 @@ function findBestMove() {
     return move;
 }
 
-// 현재 보드 상태를 평가하여 점수 반환
+// 현재 보드 상태를 평가하여 점수 반환 (점수 체계 대폭 수정)
 function evaluateBoard(player) {
     let totalScore = 0;
+    // 우선순위에 따라 점수를 재조정한 패턴
     const patterns = {
-        '11111': 100000, // 5개 연속 (승리)
-        '011110': 10000, // 열린 4
-        '11110': 500,    // 닫힌 4
-        '01111': 500,
-        '01110': 1000,   // 열린 3
-        '11100': 100,
-        '00111': 100,
-        '011010': 500,   // 띄어진 3
-        '010110': 500,
-        '001100': 100,   // 열린 2
+        '11111': 10000000,  // 5개 연속 (승리) - 최우선
+        '011110': 500000,   // 열린 4 - 사실상 승리 확정
+        '01111': 20000,     // 닫힌 4 (한쪽만 열림)
+        '11110': 20000,
+        '01110': 10000,     // 열린 3 - 강력한 공격 수
+        '010110': 5000,
+        '011010': 5000,
+        '11100': 800,       // 닫힌 3
+        '00111': 800,
+        '001100': 150,      // 열린 2
+        '01100': 100,
+        '00110': 100,
     };
 
     const opponent = player === 1 ? 2 : 1;
@@ -250,17 +270,23 @@ function evaluateBoard(player) {
             const directions = [[1, 0], [0, 1], [1, 1], [1, -1]];
             directions.forEach(([dx, dy]) => {
                 let line = '';
-                for (let i = -1; i < 6; i++) {
+                // 현재 위치를 중심으로 7칸 라인 생성
+                for (let i = -1; i < 6; i++) { 
                     const nx = x + i * dx;
                     const ny = y + i * dy;
-                    if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE || board[ny][nx] === opponent) {
-                        line += '2'; // 2는 벽 또는 상대방 돌
+                    if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE) {
+                        line += '2'; // '2'는 벽으로 간주
+                    } else if (board[ny][nx] === opponent) {
+                        line += '2'; // 상대방 돌도 벽으로 간주
                     } else {
-                        line += board[ny][nx];
+                        line += board[ny][nx]; // 0(빈칸) 또는 player의 돌
                     }
                 }
+
                 for (const [pattern, score] of Object.entries(patterns)) {
-                    if (line.includes(pattern.replace(/1/g, player))) {
+                    // 현재 플레이어에 맞게 패턴의 '1'을 플레이어 번호로 변경
+                    const playerPattern = pattern.replace(/1/g, player);
+                    if (line.includes(playerPattern)) {
                         totalScore += score;
                     }
                 }
